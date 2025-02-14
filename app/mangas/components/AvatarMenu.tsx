@@ -12,7 +12,7 @@ import { deleteCookie, hasCookie } from 'cookies-next';
 
 export default function AvatarMenu() {
 
-    const { user, updateUser } = useUserStore()
+    const { user, setUser } = useUserStore()
     const auth = getAuth(firebase)
     const router = useRouter()
     
@@ -33,7 +33,7 @@ export default function AvatarMenu() {
         setLoading(true)
         try {
             await signOut(auth)
-            updateUser(null)
+            setUser(null)
             deleteCookie('userCookie')
             router.push('/');
         } catch (error: unknown) {
