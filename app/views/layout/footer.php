@@ -1,0 +1,1 @@
+<footer class="h-10 bg-[#2E236C] text-white">Footer</footer>

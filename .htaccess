@@ -1,0 +1,11 @@
+Options -Indexes
+RewriteEngine On
+
+# Si la solicitud es solo a la raíz, redirigir a /public/
+RewriteRule ^$ public/ [L]
+
+# Reescritura de las URLs a index.php dentro de public/
+RewriteBase /manga-management/public/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
