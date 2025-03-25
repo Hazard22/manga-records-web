@@ -51,25 +51,81 @@ class Manga{
         }
     }
 
+    public function getManga($id) {
+
+        try {
+            $this->db = getDbConnection();
+            $stmt = $this->db->prepare("SELECT
+                m.id,
+                m.title,
+                m.banner_img,
+                m.color,
+                COUNT(v.id) AS total_volumes,
+                SUM(CASE WHEN v.bought THEN 1 ELSE 0 END) AS bought_volumes
+            FROM manga m
+            LEFT JOIN volume v ON m.id = v.manga_id
+            WHERE m.id = :id
+            GROUP BY m.id, m.title
+            ORDER BY m.title");
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($result) {
+
+                $stmt = $this->db->prepare("SELECT id, name, cover_img, bought, available, vol_no FROM volume WHERE manga_id = :id ORDER BY vol_no ASC");
+                $stmt->bindParam(':id', $id);
+                $stmt->execute();
+                $volume_result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $manga_data = array_merge(
+                    $result, 
+                    ['volumes' => $volume_result]
+                );
+
+                return [
+                    'success'    => true,
+                    'manga_data' => $manga_data
+                ];
+            } 
+            else{
+                return [
+                    'success' => true,
+                    'error' => 'Manga not found',
+                ];
+            }
+        } catch (PDOException $e) {
+            error_log("Error on database: " . $e->getMessage());
+            return [
+                'success' => false,
+                'error' => 'Database exception',
+                'details' => $e->getMessage()
+            ];
+        }
+
+    }
+
     public function createManga($data){
 
         $title      = $data['title'];
         $banner_img = $data['banner_img'];
+        $color      = $data['color'];
 
         try {
             $this->db = getDbConnection();
     
             if(!isset($data['banner_img']) || empty($data['banner_img'])){
-                $query = "INSERT INTO manga (title) VALUES (:title)";
+                $query = "INSERT INTO manga (title, color) VALUES (:title, :color)";
                 $stmt = $this->db->prepare($query);
                 $stmt->bindParam(':title', $title);
+                $stmt->bindParam(':color', $color);
             }else{
-                $query = "INSERT INTO manga (title, banner_img) VALUES (:title, :banner_img)";
+                $query = "INSERT INTO manga (title, banner_img, color) VALUES (:title, :banner_img, :color)";
                 $stmt = $this->db->prepare($query);
                 $stmt->bindParam(':title', $title);
                 $stmt->bindParam(':banner_img', $banner_img);
-            }
-            
+                $stmt->bindParam(':color', $color);            
+            }         
 
             if ($stmt->execute()) {
                 return [

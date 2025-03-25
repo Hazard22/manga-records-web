@@ -34,13 +34,14 @@
             x-data="{
                 title: '',
                 banner_img: '',
+                color: '#000000',
                 touched: false,
                 loading: false,
                 addManga() {
                     this.loading = true
                     const body = this.banner_img.trim() === '' 
-                    ? { title: this.title }
-                    : { title: this.title, banner_img: this.banner_img }
+                    ? { title: this.title, color: this.color }
+                    : { title: this.title, banner_img: this.banner_img, color: this.color }
                     this.loading = true;
                     fetch('/manga-management/api/v1/manga', {
                         method: 'POST',
@@ -98,11 +99,31 @@
                     <input 
                     type="text"
                     id="banner_img" 
-                    x-model="banner_img" 
-                    required 
+                    x-model="banner_img"
                     class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-black outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                     </div>
                 </div>
+
+                <div>
+                    <label for="color" class="block text-sm/6 font-medium text-white">Banner color</label>
+                    <div class="mt-2">
+                    <input 
+                    type="color"
+                    id="color" 
+                    x-model="color" 
+                    @blur="touched = true"
+                    required 
+                    class="cursor-pointer bg-transparent border-none rounded-xl w-8 h-8 appearance-none">
+                    </div>
+                </div>
+
+                <p 
+                    x-show="touched && color === ''" 
+                    class="text-red-500"
+                    x-transition
+                    >
+                    This field is required.
+                </p>
 
                 <button
                 x-bind:disabled="loading || title === '' || !touched"

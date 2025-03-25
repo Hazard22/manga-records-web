@@ -1,10 +1,12 @@
+
 <?php
 
 class Router {
     private $routes = [];
 
     public function add($route, $controller, $method = 'index', $httpMethod = 'GET') {
-        $this->routes[$route][$httpMethod] = ['controller' => $controller, 'method' => $method];
+        $routePattern = preg_replace('/\{([a-zA-Z0-9_]+)\}/', '(?P<$1>[^/]+)', $route);
+        $this->routes[$httpMethod][$routePattern] = ['controller' => $controller, 'method' => $method];
     }
 
     public function dispatch($url, $httpMethod = 'GET') {
@@ -13,19 +15,27 @@ class Router {
                 require_once "../app/controllers/UserController.php";
                 $controller = new UserController();
                 $controller->index();
+                return;
             }
-            else if (isset($this->routes[$url][$httpMethod])) {
-                $controllerName = $this->routes[$url][$httpMethod]['controller'];
-                $method = $this->routes[$url][$httpMethod]['method'];
+            foreach ($this->routes[$httpMethod] as $routePattern => $routeInfo) {
+                if (preg_match("#^$routePattern$#", $url, $matches)) {
+                    require_once "../app/controllers/{$routeInfo['controller']}.php";
+                    $controller = new $routeInfo['controller']();
+                    $method = $routeInfo['method'];
 
-                require_once "../app/controllers/{$controllerName}.php";
-                $controller = new $controllerName();
-                $controller->$method();
-            } else {
-                echo "404 - Página no encontrada";
+                    // Filtrar solo los parámetros dinámicos
+                    $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+
+                    // Llamar al método con los parámetros extraídos
+                    call_user_func_array([$controller, $method], $params);
+                    return;
+                }
             }
+
+            echo "404 - Página no encontrada";
         } catch (\Throwable $th) {
             echo $th;
         }
     }
 }
+

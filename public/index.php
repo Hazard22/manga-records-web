@@ -18,7 +18,7 @@ $router->add('register', 'UserController', 'signup');
 $router->add('home', 'HomeController', 'index'); 
 
 //Mangas
-
+$router->add('manga/{id}', 'MangaController', 'mangaData'); 
 
 //Definir api routes
 $api_prefix = 'api/v1/';
@@ -30,6 +30,7 @@ $router->add($api_prefix.'logout', 'UserController', 'logoutUser', 'POST');
 
 //Mangas
 $router->add($api_prefix.'manga', 'MangaController', 'getAllMangas', 'GET');
+$router->add($api_prefix.'manga/{id}', 'MangaController', 'getMangaData', 'GET');
 $router->add($api_prefix.'manga', 'MangaController', 'createManga', 'POST');
 
 // Obtener el método HTTP (GET, POST, PUT, DELETE, etc.)

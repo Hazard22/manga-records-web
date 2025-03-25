@@ -13,6 +13,7 @@
     <link rel="manifest" href="<?= BASE_URL ?>/favicon/site.webmanifest" />
     <!-- Styles -->
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" type="text/css" href="<?= BASE_URL ?>/css/loader.css">
     <!-- Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -32,8 +33,17 @@
     <!--Aqui debe ir el footer -->
     <?php include_once 'footer.php';?>
 
-    <?php if (isset($_SESSION['username'])): ?>
-        <?php include_once (VIEWS_PATH."/partials/AddMangaModal.php"); ?>
-    <?php endif; ?>
+    <script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('headerTitle', {
+            title: 'Manga Management',
+        })
+
+        Alpine.store('headerBgColor', {
+            title: null,
+        })
+    })
+</script>
+
 </body>
 </html>

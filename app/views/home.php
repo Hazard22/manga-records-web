@@ -1,4 +1,4 @@
-
+<?php require_once '../config/config.php'; ?>
 
 <div 
 x-data="{
@@ -37,7 +37,7 @@ x-init="fetchMangas()"
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
         >
             <template x-for="manga in mangas">
-                <div 
+                <a x-bind:href="`manga/${manga.manga_id}`"
                 class="max-w-sm rounded overflow-hidden shadow-lg text-white bg-violet-950 hidden md:block hover:cursor-pointer hover:scale-110 transition-transform">
                     <img 
                     :src="manga.latest_cover_imgs" 
@@ -55,7 +55,7 @@ x-init="fetchMangas()"
                             <p x-text="`Disponibles: ${manga.total_volumes}`"></p>
                         </div>
                     </div>
-                </div>
+                </a>
             </template>
             <!-- Moviles -->
             <template x-for="manga in mangas">
@@ -92,6 +92,10 @@ x-init="fetchMangas()"
     </template>
 
     <template x-if="loading">
-        <h3 class="text-white">Loading...</h3>
+         <div class="text-center h-screen content-center">
+            <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+         </div>
     </template>
+
+    <?php include_once (VIEWS_PATH."/partials/AddMangaModal.php"); ?>
 </div>

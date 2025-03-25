@@ -5,8 +5,12 @@ require_once "../app/models/Manga.php";
 
 class MangaController extends Controller{
 
-    public function perfil() {
-        require_once "../app/views/manga.php";
+    public function mangaData($id) {
+
+        $this->checkAuth();
+
+        $content = $this->loadView('manga', compact('id'));
+        require_once "../app/views/layout/layout.php";
     }
 
     public function getAllMangas(){
@@ -29,6 +33,39 @@ class MangaController extends Controller{
                 echo json_encode([
                     'status' => 404,
                     'data' => 'No mangas found',
+                ]);
+            }
+        }
+        else{
+            http_response_code(500);
+            echo json_encode([
+                'status' => 500,
+                'data' => $result
+            ]);
+        }
+
+    }
+
+    public function getMangaData($id){
+        header('Content-Type: application/json');
+        http_response_code(400);
+
+        $manga = new Manga();
+        $result = $manga->getManga($id);
+
+        if($result['success']){
+            if($result['manga_data']){
+                http_response_code(200);
+                echo json_encode([
+                    'status' => 200,
+                    'data' => $result['manga_data'],
+                ], JSON_UNESCAPED_SLASHES);
+            }
+            else{
+                http_response_code(404);
+                echo json_encode([
+                    'status' => 404,
+                    'data' => 'No manga found',
                 ]);
             }
         }
